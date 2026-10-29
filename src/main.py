@@ -30,6 +30,43 @@ def calculate_total_runs_scored(path : str):
         raise OSError(f"Could not read {path} :{error}") from error
     return total_scores
 
+def calculate_player_runs(path : str) -> dict[str,int]:
+    teams_player_data = {}
+    try:
+        with open(path,'r') as csv_file:
+            reader = csv.DictReader(csv_file)
+            for row in reader:
+                team = row["batting_team"]
+                player = row["batsman"]
+                runs = 0
+                if not team or not player:
+                    continue
+
+                try:
+                    runs = int(row["batsman_runs"])
+                except ValueError:
+                    raise ValueError("expected number")
+
+                if team not in teams_player_data:
+                    teams_player_data[team] = {
+                     player : runs
+                    }
+
+                else:
+                    if player not in teams_player_data[team]:
+                        teams_player_data[team][player] = runs
+                    else:
+                        teams_player_data[team][player] += runs
+
+
+    except FileNotFoundError:
+        raise FileNotFoundError(f"CSV file not found {path}")
+    except OSError as error:
+        raise OSError(f"file don't permission {error}") from error
+    return teams_player_data
+
+
+
 
 def plot(data: dict[str,int]) -> None:
     if not data:
@@ -53,9 +90,31 @@ def plot(data: dict[str,int]) -> None:
     plt.show()
 
 
+def plot_top_batsman(data: dict[str,int]):
+    if not data:
+        print("no data to process")
+        return
+    #sort data based on runs scored by each player
+    sorted_data = sorted(data.items(),key= lambda item :item[1],reverse=True)[:10]
+    players = [player for player,_ in sorted_data]
+    scores = [score for _,score in sorted_data]
 
-data = calculate_total_runs_scored(DELIVERIES_PATH)
-plot(data)
+    fig, ax = plt.subplots()
+    ax.set_title("top run getters in RCB")
+    ax.set_xlabel("Players Name")
+    ax.bar(players,scores)
+    ax.tick_params(axis="x", labelrotation=45)
+    plt.setp(ax.get_xticklabels(), ha="right")
+
+    plt.show()
+
+
+
+# data = calculate_total_runs_scored(DELIVERIES_PATH)
+# plot(data)
+
+data = calculate_player_runs(DELIVERIES_PATH)["Royal Challengers Bangalore"]
+plot_top_batsman(data)
 
 
 
