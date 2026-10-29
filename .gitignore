@@ -1,0 +1,17 @@
+#Pycharm files
+.idea/
+
+#IPL Datasets
+/resources/
+
+#python cache files
+
+__pycache__/
+*.py[cod]
+
+#Virtual Environments
+.venv
+venv/
+
+
+
