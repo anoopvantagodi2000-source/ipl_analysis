@@ -111,6 +111,7 @@ def plot(data: dict[str,int]) -> None:
     ax.tick_params(axis="x",labelrotation = 45)
     plt.setp(ax.get_xticklabels(), ha="right")
     fig.tight_layout()
+    plt.savefig('images/1.png', dpi=300, bbox_inches='tight')
 
 
     plt.show()
@@ -131,6 +132,7 @@ def plot_top_batsman(data: dict[str,int]):
     ax.bar(players,scores)
     ax.tick_params(axis="x", labelrotation=45)
     plt.setp(ax.get_xticklabels(), ha="right")
+    plt.savefig('images/2.png', dpi=300, bbox_inches='tight')
 
     plt.show()
 
@@ -148,6 +150,7 @@ def plot_umpires_from_country(data : dict[str,int]):
     ax.bar(countries,freq)
     ax.tick_params(axis="x",labelrotation = 45)
     plt.setp(ax.get_xticklabels(), ha="right")
+    plt.savefig('images/3.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -155,15 +158,15 @@ def plot_umpires_from_country(data : dict[str,int]):
 
 
 def execute():
-    # data = calculate_total_runs_scored(DELIVERIES_PATH)
-    # plot(data)
+    data = calculate_total_runs_scored(DELIVERIES_PATH)
+    plot(data)
 
-    # data = calculate_player_runs(DELIVERIES_PATH)["Royal Challengers Bangalore"]
-    # plot_top_batsman(data)
+    data = calculate_player_runs(DELIVERIES_PATH)["Royal Challengers Bangalore"]
+    plot_top_batsman(data)
 
 
-     data = calculate_umpire_from_each_country(UMPIRES_PATH)
-     plot_umpires_from_country(data)
+    data = calculate_umpire_from_each_country(UMPIRES_PATH)
+    plot_umpires_from_country(data)
 
 
 
