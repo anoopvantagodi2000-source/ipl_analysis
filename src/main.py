@@ -66,6 +66,7 @@ def calculate_player_runs(path : str) -> dict[str,int]:
         raise OSError(f"file don't permission {error}") from error
     return teams_player_data
 
+
 def calculate_umpire_from_each_country(path : str):
     #represents number of umpires from each country who represented in ipl
     country_ump_freq = defaultdict(int)
