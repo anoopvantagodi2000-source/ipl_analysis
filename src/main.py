@@ -91,6 +91,8 @@ def calculate_umpire_from_each_country(path : str):
 
 
 
+
+
 def plot(data: dict[str,int]) -> None:
     if not data:
         print("No data available to plot")
