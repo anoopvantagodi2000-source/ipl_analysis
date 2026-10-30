@@ -71,6 +71,31 @@ def fetch_extra_runs_conceded_by_year(path_of_matches:str,path_of_deliveries:str
                 extra_deliveries[team] += int(delivery["extra_runs"])
     return extra_deliveries
 
+def fetch_economical_bowler_in_year(path_of_matches:str,path_of_deliveries:str, year: str):
+    match_ids = set()
+    with open(path_of_matches,'r',encoding="utf-8") as match_csv:
+        matches = csv.DictReader(match_csv)
+        for match in matches:
+            if match["season"] == year:
+                match_ids.add(match["id"])
+    bowler_run_conceded = defaultdict(int)
+    total_ball_bowled = defaultdict(int)
+    with open(path_of_deliveries,'r',encoding= "utf-8") as del_csv:
+        deliveries = csv.DictReader(del_csv)
+        for delivery in deliveries:
+            if delivery["match_id"] in match_ids:
+                bowler = delivery["bowler"]
+                bowler_run_conceded[bowler] += int(delivery["total_runs"])-int(delivery["bye_runs"]) - int(delivery["legbye_runs"])-int(delivery["penalty_runs"])
+                wide = int(delivery["wide_runs"])
+                no_ball = int(delivery["noball_runs"])
+                if wide == 0 and no_ball == 0:
+                   total_ball_bowled[bowler] += 1
+
+    economy_of_bowler = {}
+    for bowler in bowler_run_conceded.keys():
+        economy_of_bowler[bowler] = round(bowler_run_conceded[bowler]/total_ball_bowled[bowler],2)
+
+    return economy_of_bowler
 
 
 
@@ -105,7 +130,7 @@ def plot(data: dict):
     ax.set_xlabel("Season")
     ax.set_ylabel("Matches Played")
     ax.legend()
-
+    plt.savefig('images/4.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 def plot_number_of_matches_played_per_year(data:dict):
@@ -120,7 +145,7 @@ def plot_number_of_matches_played_per_year(data:dict):
 
     plt.setp(ast.get_xticklabels(), ha="right")
     fig.tight_layout()
-
+    plt.savefig('images/5.png', dpi=300, bbox_inches='tight')
 
     plt.show()
 
@@ -147,7 +172,7 @@ def plot_stack_graph(data:dict):
     ax.set_ylabel("Matches Won")
     ax.legend()
 
-    plt.show()
+    plt.savefig('images/6.png', dpi=300, bbox_inches='tight')
 
 def plot_extra_runs_conceded(data : dict):
     sorted_data = sorted(data.items(),key= lambda item : item[1])
@@ -162,25 +187,50 @@ def plot_extra_runs_conceded(data : dict):
     ast.tick_params(axis="x", labelrotation=45)
     plt.setp(ast.get_xticklabels(), ha="right")
     fig.tight_layout()
+    plt.savefig('images/7.png', dpi=300, bbox_inches='tight')
 
+    plt.show()
+
+
+
+def plot_economical_bowler(data : dict):
+    sorted_data = sorted(data.items(),key= lambda item : item[1])
+    bowler_names = [bowler for bowler,_ in sorted_data][:10]
+    extra_runs = [runs for _,runs in sorted_data][:10]
+    fig,ast = plt.subplots()
+    ast.bar(bowler_names,extra_runs)
+    ast.set_title("Top 10 Economical bowlers year 2015")
+    ast.set_xlabel("Bowlers")
+    ast.set_ylabel("runs conceded")
+
+    ast.tick_params(axis="x", labelrotation=45)
+    plt.setp(ast.get_xticklabels(), ha="right")
+    fig.tight_layout()
+    plt.savefig('images/8.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
 
 
 
+def execute():
+    data = calculate(MATCH_CSV_PATH)
+    plot(data)
+    # data = calculate(MATCH_CSV_PATH)
+    # plot_number_of_matches_played_per_year(data)
+    #
+    # data = fetch_number_of_matches_won_by_each_team(MATCH_CSV_PATH)
+    # plot_stack_graph(data)
+    #
+    # data = fetch_extra_runs_conceded_by_year(MATCH_CSV_PATH,DELIVERIES_PATH,"2016")
+    # plot_extra_runs_conceded(data)
+    #
+    # data = fetch_economical_bowler_in_year(MATCH_CSV_PATH, DELIVERIES_PATH, "2015")
+    # plot_economical_bowler(data)
 
 
 
+execute()
 
-# data = calculate(MATCH_CSV_PATH)
-# plot_number_of_matches_played_per_year(data)
-
-# data = fetch_number_of_matches_won_by_each_team(MATCH_CSV_PATH)
-# plot_stack_graph(data)
-
-
-data = fetch_extra_runs_conceded_by_year(MATCH_CSV_PATH,DELIVERIES_PATH,"2016")
-plot_extra_runs_conceded(data)
 
 
