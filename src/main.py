@@ -8,6 +8,7 @@ from collections import defaultdict
 
 
 DELIVERIES_PATH = "./resources/deliveries.csv"
+UMPIRES_PATH = "./resources/umpires.csv"
 
 def calculate_total_runs_scored(path : str):
     total_scores = defaultdict(int)
@@ -65,6 +66,28 @@ def calculate_player_runs(path : str) -> dict[str,int]:
         raise OSError(f"file don't permission {error}") from error
     return teams_player_data
 
+def calculate_umpire_from_each_country(path : str):
+    #represents number of umpires from each country who represented in ipl
+    country_ump_freq = defaultdict(int)
+    try :
+        with open(path,'r',encoding="utf-8") as umpires_csv_file:
+            umpires_row = csv.DictReader(umpires_csv_file)
+            for row in umpires_row:
+                country = row["country"]
+                if not country:
+                    continue
+                else:
+                   country_ump_freq[country]   += 1
+    except FileNotFoundError:
+        raise FileNotFoundError(f"CSV File not found {path}")
+    except OSError as err:
+        raise OSError(f"permission denied by {err}") from err
+    return  country_ump_freq
+
+
+
+
+
 
 
 
@@ -100,7 +123,7 @@ def plot_top_batsman(data: dict[str,int]):
     scores = [score for _,score in sorted_data]
 
     fig, ax = plt.subplots()
-    ax.set_title("top run getters in RCB")
+    ax.set_title("Top run getters in RCB")
     ax.set_xlabel("Players Name")
     ax.bar(players,scores)
     ax.tick_params(axis="x", labelrotation=45)
@@ -108,13 +131,43 @@ def plot_top_batsman(data: dict[str,int]):
 
     plt.show()
 
+def plot_umpires_from_country(data : dict[str,int]):
+    if not data:
+        print("There is no data to plot")
+    sorted_data = sorted(data.items(), key=lambda item: item[1])
+    sorted_data = sorted_data[:len(sorted_data)-1]
+    countries = [country for country ,_ in sorted_data]
+    freq = [freq for _,freq in sorted_data]
+    fig,ax = plt.subplots()
+    ax.set_title("# of Umpires represented from countries in IPL")
+    ax.set_xlabel("country")
+
+    ax.bar(countries,freq)
+    ax.tick_params(axis="x",labelrotation = 45)
+    plt.setp(ax.get_xticklabels(), ha="right")
+    plt.show()
 
 
-# data = calculate_total_runs_scored(DELIVERIES_PATH)
-# plot(data)
 
-data = calculate_player_runs(DELIVERIES_PATH)["Royal Challengers Bangalore"]
-plot_top_batsman(data)
+
+
+def execute():
+    # data = calculate_total_runs_scored(DELIVERIES_PATH)
+    # plot(data)
+
+    # data = calculate_player_runs(DELIVERIES_PATH)["Royal Challengers Bangalore"]
+    # plot_top_batsman(data)
+
+
+     data = calculate_umpire_from_each_country(UMPIRES_PATH)
+     plot_umpires_from_country(data)
+
+
+
+execute()
+
+
+
 
 
 
